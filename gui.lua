@@ -1,4 +1,3 @@
-
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -12,25 +11,28 @@ local OrionLib = {
 	Connections = {},
 	Flags = {},
 	Themes = {
-        Default = {
-            Main = Color3.fromRGB(80, 70, 120),
-            Second = Color3.fromRGB(90, 80, 140),
-            Stroke = Color3.fromRGB(110, 100, 180),
-            Divider = Color3.fromRGB(100, 90, 160),
-            Text = Color3.fromRGB(240, 240, 250),
-            TextDark = Color3.fromRGB(200, 200, 220),
-        }  
+		Default = {
+			Main = Color3.fromRGB(23, 23, 23),
+			Second = Color3.fromRGB(35, 35, 35),
+			Stroke = Color3.fromRGB(55, 55, 55),
+			Divider = Color3.fromRGB(55, 55, 55),
+			Text = Color3.fromRGB(250, 250, 250),
+			TextDark = Color3.fromRGB(150, 150, 150)
+		}
 	},
 	SelectedTheme = "Default",
 	Folder = nil,
 	SaveCfg = false
 }
-
 local Icons = {}
 
 local Success, Response = pcall(function()
 	Icons = HttpService:JSONDecode(game:HttpGetAsync("https://raw.githubusercontent.com/evoincorp/lucideblox/master/src/modules/util/icons.json")).icons
 end)
+
+if not Success then
+	warn("\nOrion Library - Failed to load Feather Icons. Error code: " .. Response .. "\n")
+end	
 
 local function GetIcon(IconName)
 	if Icons[IconName] ~= nil then
@@ -115,7 +117,7 @@ local function AddDraggingFunctionality(DragPoint, Main)
 		UserInputService.InputChanged:Connect(function(Input)
 			if Input == DragInput and Dragging then
 				local Delta = Input.Position - MousePos
-				TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position  = UDim2.new(FramePos.X.Scale,FramePos.X.Offset + Delta.X, FramePos.Y.Scale, FramePos.Y.Offset + Delta.Y)}):Play()
+				TweenService:Create(Main, TweenInfo.new(0.45, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position  = UDim2.new(FramePos.X.Scale,FramePos.X.Offset + Delta.X, FramePos.Y.Scale, FramePos.Y.Offset + Delta.Y)}):Play()
 			end
 		end)
 	end)
@@ -250,7 +252,7 @@ end
 
 CreateElement("Corner", function(Scale, Offset)
 	local Corner = Create("UICorner", {
-		CornerRadius = UDim.new(Scale or 0, Offset or 2)
+		CornerRadius = UDim.new(Scale or 0, Offset or 10)
 	})
 	return Corner
 end)
@@ -383,6 +385,11 @@ local NotificationHolder = SetProps(SetChildren(MakeElement("TFrame"), {
 
 function OrionLib:MakeNotification(NotificationConfig)
 	spawn(function()
+		NotificationConfig.Name = NotificationConfig.Name or "Notification"
+		NotificationConfig.Content = NotificationConfig.Content or "Test"
+		NotificationConfig.Image = NotificationConfig.Image or "rbxassetid://4384403532"
+		NotificationConfig.Time = NotificationConfig.Time or 15
+
 		local NotificationParent = SetProps(MakeElement("TFrame"), {
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
@@ -459,18 +466,18 @@ function OrionLib:MakeWindow(WindowConfig)
 	local UIHidden = false
 
 	WindowConfig = WindowConfig or {}
-	WindowConfig.Name = WindowConfig.Name or "Yuqav Hub"
+	WindowConfig.Name = WindowConfig.Name or "Orion Library"
 	WindowConfig.ConfigFolder = WindowConfig.ConfigFolder or WindowConfig.Name
 	WindowConfig.SaveConfig = WindowConfig.SaveConfig or false
 	WindowConfig.HidePremium = WindowConfig.HidePremium or false
 	if WindowConfig.IntroEnabled == nil then
 		WindowConfig.IntroEnabled = true
 	end
-	WindowConfig.IntroText = WindowConfig.IntroText or "Yuqav Hub"
+	WindowConfig.IntroText = WindowConfig.IntroText or "Orion Library"
 	WindowConfig.CloseCallback = WindowConfig.CloseCallback or function() end
 	WindowConfig.ShowIcon = WindowConfig.ShowIcon or false
-	WindowConfig.Icon = WindowConfig.Icon or ""
-	WindowConfig.IntroIcon = WindowConfig.IntroIcon or ""
+	WindowConfig.Icon = WindowConfig.Icon or "rbxassetid://8834748103"
+	WindowConfig.IntroIcon = WindowConfig.IntroIcon or "rbxassetid://8834748103"
 	OrionLib.Folder = WindowConfig.ConfigFolder
 	OrionLib.SaveCfg = WindowConfig.SaveConfig
 
@@ -505,13 +512,19 @@ function OrionLib:MakeWindow(WindowConfig)
 	local MinimizeBtn = SetChildren(SetProps(MakeElement("Button"), {
 		Size = UDim2.new(0.5, 0, 1, 0),
 		BackgroundTransparency = 1
-	}))
+	}), {
+		AddThemeObject(SetProps(MakeElement("Image", "rbxassetid://7072719338"), {
+			Position = UDim2.new(0, 9, 0, 6),
+			Size = UDim2.new(0, 18, 0, 18),
+			Name = "Ico"
+		}), "Text")
+	})
 
 	local DragPoint = SetProps(MakeElement("TFrame"), {
 		Size = UDim2.new(1, 0, 0, 50)
 	})
 
-local WindowStuff = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 10), {
+	local WindowStuff = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 10), {
 		Size = UDim2.new(0, 150, 1, -50),
 		Position = UDim2.new(0, 0, 0, 50)
 	}), {
@@ -532,11 +545,20 @@ local WindowStuff = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame"
 			Size = UDim2.new(1, 0, 0, 50),
 			Position = UDim2.new(0, 0, 1, -50)
 		}), {
+			AddThemeObject(SetProps(MakeElement("Frame"), {
+				Size = UDim2.new(1, 0, 0, 1)
+			}), "Stroke"), 
 			AddThemeObject(SetChildren(SetProps(MakeElement("Frame"), {
 				AnchorPoint = Vector2.new(0, 0.5),
 				Size = UDim2.new(0, 32, 0, 32),
 				Position = UDim2.new(0, 10, 0.5, 0)
 			}), {
+				SetProps(MakeElement("Image", "https://www.roblox.com/headshot-thumbnail/image?userId=".. LocalPlayer.UserId .."&width=420&height=420&format=png"), {
+					Size = UDim2.new(1, 0, 1, 0)
+				}),
+				AddThemeObject(SetProps(MakeElement("Image", "rbxassetid://4031889928"), {
+					Size = UDim2.new(1, 0, 1, 0),
+				}), "Second"),
 				MakeElement("Corner", 1)
 			}), "Divider"),
 			SetChildren(SetProps(MakeElement("TFrame"), {
@@ -547,6 +569,12 @@ local WindowStuff = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame"
 				AddThemeObject(MakeElement("Stroke"), "Stroke"),
 				MakeElement("Corner", 1)
 			}),
+			AddThemeObject(SetProps(MakeElement("Label", LocalPlayer.DisplayName, WindowConfig.HidePremium and 14 or 13), {
+				Size = UDim2.new(1, -60, 0, 13),
+				Position = WindowConfig.HidePremium and UDim2.new(0, 50, 0, 19) or UDim2.new(0, 50, 0, 12),
+				Font = Enum.Font.GothamBold,
+				ClipsDescendants = true
+			}), "Text"),
 			AddThemeObject(SetProps(MakeElement("Label", "", 12), {
 				Size = UDim2.new(1, -60, 0, 12),
 				Position = UDim2.new(0, 50, 1, -25),
@@ -573,6 +601,13 @@ local WindowStuff = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame"
 		Size = UDim2.new(0, 615, 0, 344),
 		ClipsDescendants = true
 	}), {
+		--SetProps(MakeElement("Image", "rbxassetid://3523728077"), {
+		--	AnchorPoint = Vector2.new(0.5, 0.5),
+		--	Position = UDim2.new(0.5, 0, 0.5, 0),
+		--	Size = UDim2.new(1, 80, 1, 320),
+		--	ImageColor3 = Color3.fromRGB(33, 33, 33),
+		--	ImageTransparency = 0.7
+		--}),
 		SetChildren(SetProps(MakeElement("TFrame"), {
 			Size = UDim2.new(1, 0, 0, 50),
 			Name = "TopBar"
@@ -611,15 +646,15 @@ local WindowStuff = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame"
 		MainWindow.Visible = false
 		UIHidden = true
 		OrionLib:MakeNotification({
-			Name = "Gui Hide",
-			Content = "Tap F to open gui",
+			Name = "Interface Hidden",
+			Content = "Tap RightShift to reopen the interface",
 			Time = 5
 		})
 		WindowConfig.CloseCallback()
 	end)
 
 	AddConnection(UserInputService.InputBegan, function(Input)
-		if Input.KeyCode == Enum.KeyCode.F and UIHidden then
+		if Input.KeyCode == Enum.KeyCode.RightShift and UIHidden then
 			MainWindow.Visible = true
 		end
 	end)
@@ -1247,6 +1282,7 @@ local WindowStuff = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame"
 				}), "Second")
 
 				AddConnection(BindBox.Value:GetPropertyChangedSignal("Text"), function()
+					--BindBox.Size = UDim2.new(0, BindBox.Value.TextBounds.X + 16, 0, 24)
 					TweenService:Create(BindBox, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, BindBox.Value.TextBounds.X + 16, 0, 24)}):Play()
 				end)
 
@@ -1372,6 +1408,7 @@ local WindowStuff = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame"
 				}), "Second")
 
 				AddConnection(TextboxActual:GetPropertyChangedSignal("Text"), function()
+					--TextContainer.Size = UDim2.new(0, TextboxActual.TextBounds.X + 16, 0, 24)
 					TweenService:Create(TextContainer, TweenInfo.new(0.45, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, TextboxActual.TextBounds.X + 16, 0, 24)}):Play()
 				end)
 
@@ -1668,7 +1705,15 @@ local WindowStuff = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame"
 		end
 		return ElementFunction   
 	end  
+	
+	OrionLib:MakeNotification({
+		Name = "UI Library Upgrade",
+		Content = "New UI Library Available at sirius.menu/discord and sirius.menu/rayfield",
+		Time = 5
+	})
+	
 
+	
 	return TabFunction
 end   
 
